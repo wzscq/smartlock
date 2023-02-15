@@ -15,10 +15,10 @@ if [ ! -e package/service ]; then
   mkdir package/service
 fi
 
-if [ -e package/service/smartlock ]; then
-  rm -rf package/service/smartlock
+if [ -e package/service/smartlockservice ]; then
+  rm -rf package/service/smartlockservice
 fi
 
-mv ../service/smartlock ./package/service/smartlock
+mv ../service/smartlockservice ./package/service/smartlockservice
 
 echo smartlock build over.

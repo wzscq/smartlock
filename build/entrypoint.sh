@@ -1,3 +1,3 @@
 nginx
 cd /services/smartlock
-./smartlock
+./smartlockservice
