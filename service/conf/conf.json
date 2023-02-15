@@ -1,0 +1,18 @@
+{
+    "service":{
+        "port":"localhost:8301"
+    },
+    "mqtt":{
+        "broker":"tcp://49.4.3.226:1983",
+        "password":"123456",
+        "user":"mosquitto",
+        "sendTopic":"locktopic/send",
+        "acceptTopic":"locktopic/accept",
+        "clientID":"smartlockservice_client"
+    },
+    "crv":{
+        "server":"http://127.0.0.1:8200",
+        "appID":"smartlock",
+        "token":"lockapi"
+    }
+}
