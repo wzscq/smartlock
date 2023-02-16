@@ -3,12 +3,12 @@
         "port":"localhost:8301"
     },
     "mqtt":{
-        "broker":"tcp://49.4.3.226:1983",
+        "broker":"tcp://121.36.192.249:1983",
         "password":"123456",
         "user":"mosquitto",
         "sendTopic":"locktopic/send",
         "acceptTopic":"locktopic/accept",
-        "clientID":"smartlockservice_client"
+        "clientID":"smartlockservice_client_test"
     },
     "crv":{
         "server":"http://127.0.0.1:8200",

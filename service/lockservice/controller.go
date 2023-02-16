@@ -57,7 +57,7 @@ func (controller *SmartLockController)open(c *gin.Context){
 	}
 
 	//保存数据
-	//controller.CRVClient.Save(&rep,header.Token)
+	controller.LockOperator.CRVClient.Save(&rep,header.Token)
 
 	rsp:=common.CreateResponse(nil,nil)
 	c.IndentedJSON(http.StatusOK, rsp)
