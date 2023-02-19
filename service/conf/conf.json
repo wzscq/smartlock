@@ -8,7 +8,9 @@
         "user":"mosquitto",
         "sendTopic":"locktopic/send",
         "acceptTopic":"locktopic/accept",
-        "clientID":"smartlockservice_client_test"
+        "clientID":"smartlockservice_client_test",
+        "keyControlSendTopic":"keytopic/send",
+        "keyControlAcceptTopic":"keytopic/accept"
     },
     "crv":{
         "server":"http://127.0.0.1:8200",

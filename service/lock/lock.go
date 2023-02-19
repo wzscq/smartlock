@@ -28,6 +28,50 @@ type LockOperator struct {
 	CRVClient *crv.CRVClient
 	MQTTClient *mqtt.MQTTClient
 	AcceptTopic string
+	KeyControlSendTopic string
+}
+
+var applicatonFields=[]map[string]interface{}{
+	{"field": "id"},
+	{
+		"field":"locks",
+		"fieldType":"many2many",
+		"relatedModelID":"sl_lock",
+		"fields": []map[string]interface{}{
+			{"field": "id"},
+			{"field": "name"},
+		},
+	},
+	{
+		"field":"operators",
+		"fieldType":"many2many",
+		"relatedModelID":"sl_person",
+		"fields": []map[string]interface{}{
+			{"field": "id"},
+			{"field": "name"},
+		},
+	},
+	{
+		"field":"approver",
+		"fieldType":"many2one",
+		"relatedModelID":"sl_person",
+		"fields": []map[string]interface{}{
+			{"field": "id"},
+			{"field": "name"},
+		},
+	},
+	{"field":"start_date"},
+	{"field":"end_date"},
+	{"field":"start_time"},
+	{"field":"end_time"},
+	{"field":"description"},
+	{"field":"status"},
+	{"field":"approval_comments"},
+	{"field":"create_time"},
+	{"field":"create_user"},
+	{"field":"update_time"},
+	{"field":"update_user"},
+	{"field":"version"},
 }
 
 func (lockOperator *LockOperator)GetOperParamStr(param *OperParam)(string,int){
@@ -83,4 +127,37 @@ func (lockOperator *LockOperator)DealZZSS(op *OperParam){
 		}
 		lockOperator.CRVClient.Save(saveReq,"")
 	}
+}
+
+func (lockOperator *LockOperator)WriteKey(appID,token string)(int){
+	//查询数据
+	commonRep:=crv.CommonReq{
+		ModelID:"sl_application",
+		Filter:&map[string]interface{}{
+			"id":appID,
+		},
+		Fields:&applicatonFields,
+	}
+
+	req,commonErr:=lockOperator.CRVClient.Query(&commonRep,token)
+	if commonErr!=common.ResultSuccess {
+		return commonErr
+	}
+
+	//构造发送结构
+	bytes, err := json.Marshal(req)
+	if err!=nil {
+		log.Println("WriteKey convert query result to json error:",err.Error())
+		return common.ResultJonsMarshalError
+	}
+  // Convert bytes to string.
+  jsonStr := string(bytes)
+
+	//发送mq消息	
+	commonErr=lockOperator.MQTTClient.Publish(lockOperator.KeyControlSendTopic,jsonStr)	
+	if commonErr!=common.ResultSuccess {
+		return commonErr
+	}
+
+	return common.ResultSuccess
 }

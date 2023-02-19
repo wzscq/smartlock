@@ -64,8 +64,50 @@ func (controller *SmartLockController)open(c *gin.Context){
 	log.Println("SmartLockController end open")
 }
 
+func (controller *SmartLockController)writekey(c *gin.Context){
+	log.Println("SmartLockController start writekey")
+	
+	var header crv.CommonHeader
+	if err := c.ShouldBindHeader(&header); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end writekey with error")
+		return
+	}	
+	
+	var rep crv.CommonReq
+	if err := c.BindJSON(&rep); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		return
+  }	
+
+	if rep.SelectedRowKeys ==nil || len(*rep.SelectedRowKeys)==0 {
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("SmartLockController end writekey with error：request list is empty")
+		return
+	}
+
+	//发送消息
+	applicationID:=(*rep.SelectedRowKeys)[0]
+	err:=controller.LockOperator.WriteKey(applicationID,header.Token)
+	if err!=common.ResultSuccess {
+		rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		return
+	}
+	
+	rsp:=common.CreateResponse(nil,nil)
+	c.IndentedJSON(http.StatusOK, rsp)
+	log.Println("SmartLockController end writekey")
+}
+
 //Bind bind the controller function to url
 func (controller *SmartLockController) Bind(router *gin.Engine) {
 	log.Println("Bind SmartLockController")
 	router.POST("/open", controller.open)
+	router.POST("/writekey", controller.writekey)
 }

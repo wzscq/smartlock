@@ -53,6 +53,7 @@ func main() {
 		MQTTClient:mqttClient,
 		AcceptTopic:conf.MQTT.AcceptTopic,
 		CRVClient:crvClinet,
+		KeyControlSendTopic:conf.MQTT.KeyControlSendTopic,
 	}
 
 	mqttClient.Handler=lockOperator

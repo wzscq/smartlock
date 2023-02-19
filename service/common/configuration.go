@@ -17,6 +17,8 @@ type mqttConf struct {
 	SendTopic string `json:"sendTopic"`
 	AcceptTopic string `json:"acceptTopic"`
 	ClientID string `json:"clientID"`
+	KeyControlSendTopic string `json:"keyControlSendTopic"`
+	KeyControlAcceptTopic string `json:"keyControlAcceptTopic"`
 }
 
 type crvConf struct {

@@ -57,7 +57,7 @@ type CommonReq struct {
 	AppDB *string `json:"appDB"`
 	UserRoles *string `json:"userRoles"`
 	//Sorter *[]sorter `json:"sorter"`
-	//SelectedRowKeys *[]string `json:"selectedRowKeys"`
+	SelectedRowKeys *[]string `json:"selectedRowKeys"`
 	Pagination *Pagination `json:"pagination"`
 }
 
