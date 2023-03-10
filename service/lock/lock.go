@@ -6,6 +6,7 @@ import (
 	"smartlockservice/crv"
 	"log"	
 	"encoding/json"
+	"time"
 )
 
 const (
@@ -15,13 +16,15 @@ const (
 	OPER_STATUS="MSZT"  //门锁状态
 	OPER_GETID ="SHSC"  //锁号上传
 	OPER_ZZSS = "ZTSS"  //状态上送
+	OPER_SHSS = "SHSS"  //锁号上送
 )
 
 type OperParam struct {
 	LockID string `json:"lock_number"`
 	OperType string `json:"command_type"`
 	TimeLapse *string `json:"time_lapse"`
-	Data []map[string]interface{} `json:"data"`
+	Time *string `json:"time"`
+	Data []interface{} `json:"data"`
 }
 
 type LockOperator struct {
@@ -74,6 +77,10 @@ var applicatonFields=[]map[string]interface{}{
 	{"field":"version"},
 }
 
+var lockFields=[]map[string]interface{}{
+	{"field": "id"},
+}
+
 func (lockOperator *LockOperator)GetOperParamStr(param *OperParam)(string,int){
 	bytes, err := json.Marshal(param)
 	if err!=nil {
@@ -115,9 +122,10 @@ func (lockOperator *LockOperator)DealZZSS(op *OperParam){
 	if op.Data!=nil && len(op.Data)>0 {
 		lockList:=make([]map[string]interface{},len(op.Data))
 		for index,lockItem:=range op.Data {
+			lockItemMap:=lockItem.(map[string]interface{})
 			lockList[index]=map[string]interface{}{
-				"lock_id":lockItem["lock_number"],
-				"status":lockItem["lock_status"],
+				"lock_id":lockItemMap["lock_number"],
+				"status":lockItemMap["lock_status"],
 				"_save_type":"create",
 			}
 		}
@@ -160,4 +168,47 @@ func (lockOperator *LockOperator)WriteKey(appID,token string)(int){
 	}
 
 	return common.ResultSuccess
+}
+
+func (lockOperator *LockOperator)SyncLockList(token string)(int){
+	//查询数据
+	commonRep:=crv.CommonReq{
+		ModelID:"sl_lock",
+		Fields:&lockFields,
+	}
+
+	rsp,commonErr:=lockOperator.CRVClient.Query(&commonRep,token)
+	if commonErr!=common.ResultSuccess {
+		return commonErr
+	}
+
+	if rsp.Error == true {
+		return rsp.ErrorCode
+	}
+
+	resLst,ok:=rsp.Result["list"].([]interface{})
+	if !ok {
+		return common.ResultNoParams
+	}
+
+	var data=[]interface{}{}
+	for _,item:=range resLst {
+		lockItem:=item.(map[string]interface{})
+		data=append(data,lockItem["id"])
+	}
+
+	//{'time': '2023-01-12 17:07:20', 'command_type': 'SHSS'#锁号上送, 'data': ['000000ab', '000000ac']}
+	timeStr:=time.Now().Format("2006-01-02 15:04:05")
+	param:=&OperParam{
+		Time:&timeStr,
+		OperType:OPER_SHSS,
+		Data:data,
+	}
+
+	paramStr,err:=lockOperator.GetOperParamStr(param)
+	if err!=common.ResultSuccess {
+		return err
+	}
+
+	return lockOperator.MQTTClient.Publish(lockOperator.AcceptTopic,paramStr)
 }

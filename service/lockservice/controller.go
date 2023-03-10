@@ -105,9 +105,34 @@ func (controller *SmartLockController)writekey(c *gin.Context){
 	log.Println("SmartLockController end writekey")
 }
 
+func (controller *SmartLockController)syncLockList(c *gin.Context){
+	log.Println("SmartLockController start syncLockList")
+
+	var header crv.CommonHeader
+	if err := c.ShouldBindHeader(&header); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end writekey with error")
+		return
+	}	
+
+	err:=controller.LockOperator.SyncLockList(header.Token)
+	if err!=common.ResultSuccess {
+		rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		return
+	}
+
+	rsp:=common.CreateResponse(nil,nil)
+	c.IndentedJSON(http.StatusOK, rsp)
+	log.Println("SmartLockController end syncLockList")
+}
+
 //Bind bind the controller function to url
 func (controller *SmartLockController) Bind(router *gin.Engine) {
 	log.Println("Bind SmartLockController")
 	router.POST("/open", controller.open)
 	router.POST("/writekey", controller.writekey)
+	router.POST("/syncLockList", controller.syncLockList)
 }

@@ -17,3 +17,9 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 3、external_api配置修改，增加了writekey接口
 4、smartlockservice修改，增加writekey接口逻辑
 5、修改配置文件，增加了和钥匙管理机通信的两个topic
+
+2023-03-10 增加锁信息同步功能，可以将系统中的所有锁信息同步到后台状态监控模块
+1、修改以下配置文件
+    ls_lock   增加同步锁信息按钮
+    external_api配置修改，增加了syncLockList接口
+2、smartlockservice修改，增加syncLockList接口逻辑

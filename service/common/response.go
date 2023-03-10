@@ -21,17 +21,11 @@ const (
 	ResultCreateFileError=10000029
 	ResultCannotLoginCRV = 10100002
 	ResultNoParams = 10100003
-	ResultNoDtcList = 10100004
-	ResultNoDiagConf = 10100005
 	ResultNoNoVehicle = 10100006
 	ResultQueryRequestError = 10100007
 	ResultMqttClientError = 10100008
 	ResultSaveDataError = 10100010
 	ResultCacheSendRecError = 10100011
-	ResultRepeatedEcu = 10100012
-	ResultMultiProject = 10100013
-	ResultParamWithoutEcu = 10100014
-	ResultWrongDiagConf = 10100015
 	ResultJonsMarshalError = 10000043
 )
 
@@ -52,28 +46,13 @@ var errMsg = map[int]CommonRsp{
 		Error:true,
 	},
 	ResultCannotLoginCRV:CommonRsp{
-		ErrorCode:ResultWrongRequest,
+		ErrorCode:ResultCannotLoginCRV,
 		Message:"连接到基础数据平台失败，请与管理员联系处理",
 		Error:true,
 	},
 	ResultNoParams:CommonRsp{
 		ErrorCode:ResultNoParams,
 		Message:"下发参数时未查询到对应的配置参数信息，请刷新页面数据后重新尝试",
-		Error:true,
-	},
-	ResultNoDtcList:CommonRsp{
-		ErrorCode:ResultNoDtcList,
-		Message:"下发参数时未查询到对应的DTC信息，请确认DTC信息配置正确后重新尝试",
-		Error:true,
-	},
-	ResultNoDiagConf:CommonRsp{
-		ErrorCode:ResultNoDiagConf,
-		Message:"下发参数时未查询到诊断配置信息，请确认诊断信息正确配置后重新尝试",
-		Error:true,
-	},
-	ResultNoNoVehicle:CommonRsp{
-		ErrorCode:ResultNoNoVehicle,
-		Message:"下发参数时未查询到车辆信息，请确认诊车辆信息正确配置后重新尝试",
 		Error:true,
 	},
 	ResultQueryRequestError:CommonRsp{
@@ -96,21 +75,6 @@ var errMsg = map[int]CommonRsp{
 		Message:"缓存下发参数时发生错误，请与管理员联系处理",
 		Error:true,
 	},
-	ResultRepeatedEcu:CommonRsp{
-		ErrorCode:ResultRepeatedEcu,
-		Message:"下发参数中包含重复的ECU，请检查选择参数正确后重新尝试",
-		Error:true,
-	},
-	ResultMultiProject:CommonRsp{
-		ErrorCode:ResultMultiProject,
-		Message:"下发参数中不能包含多个项目的参数，请检查选择参数正确后重新尝试",
-		Error:true,
-	},
-	ResultParamWithoutEcu:CommonRsp{
-		ErrorCode:ResultParamWithoutEcu,
-		Message:"下发参数中未指定ECU信息，请检查选择参数正确后重新尝试",
-		Error:true,
-	},
 	ResultCreateDirError:CommonRsp{
 		ErrorCode:ResultCreateDirError,
 		Message:"保存文件时创建文件夹失败，请与管理员联系处理",
@@ -124,11 +88,6 @@ var errMsg = map[int]CommonRsp{
 	ResultCreateFileError:CommonRsp{
 		ErrorCode:ResultBase64DecodeError,
 		Message:"创建文件失败，请与管理员联系处理",
-		Error:true,
-	},
-	ResultWrongDiagConf:CommonRsp{
-		ErrorCode:ResultWrongDiagConf,
-		Message:"下发参数时诊断配置信息不完整，请确认诊断信息正确配置后重新尝试",
 		Error:true,
 	},
 }
