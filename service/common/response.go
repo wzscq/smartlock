@@ -21,12 +21,13 @@ const (
 	ResultCreateFileError=10000029
 	ResultCannotLoginCRV = 10100002
 	ResultNoParams = 10100003
-	ResultNoNoVehicle = 10100006
+	ResultQueryLockError = 10100006
 	ResultQueryRequestError = 10100007
 	ResultMqttClientError = 10100008
 	ResultSaveDataError = 10100010
 	ResultCacheSendRecError = 10100011
 	ResultJonsMarshalError = 10000043
+	ResultOpenLockError = 10000044
 )
 
 var errMsg = map[int]CommonRsp{
@@ -34,6 +35,16 @@ var errMsg = map[int]CommonRsp{
 		ErrorCode:ResultSuccess,
 		Message:"操作成功",
 		Error:false,
+	},
+	ResultQueryLockError:CommonRsp{
+		ErrorCode:ResultQueryLockError,
+		Message:"没有查询到锁的信息，不能执行远程指令",
+		Error:true,
+	},
+	ResultOpenLockError:CommonRsp{
+		ErrorCode:ResultOpenLockError,
+		Message:"发送开锁指令到网关失败，请检查智能锁网关配置和状态是否正常",
+		Error:true,
 	},
 	ResultJonsMarshalError:CommonRsp{
 		ErrorCode:ResultJonsMarshalError,

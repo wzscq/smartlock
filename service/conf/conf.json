@@ -3,12 +3,12 @@
         "port":"localhost:8301"
     },
     "mqtt":{
-        "broker":"tcp://121.36.192.249:1983",
+        "broker":"tcp://121.37.185.248:1983",
         "password":"123456",
         "user":"mosquitto",
         "sendTopic":"locktopic/send",
         "acceptTopic":"locktopic/accept",
-        "clientID":"smartlockservice_client_test",
+        "clientID":"smartlockservice_client_test1",
         "keyControlSendTopic":"keytopic/send",
         "keyControlAcceptTopic":"keytopic/accept"
     },
@@ -16,5 +16,11 @@
         "server":"http://127.0.0.1:8200",
         "appID":"smartlock",
         "token":"lockapi"
+    },
+    "lockMonitor":{
+        "hubPort":"18100",
+        "interval":"500ms",
+        "batchInterval":"10s",
+        "timeout":"5s"
     }
 }

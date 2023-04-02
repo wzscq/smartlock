@@ -3,6 +3,7 @@ package lockservice
 import (
 	"smartlockservice/common"
 	"smartlockservice/lock"
+	"smartlockservice/lockhub"
 	"smartlockservice/crv"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -11,6 +12,7 @@ import (
 
 type SmartLockController struct {
 	LockOperator *lock.LockOperator
+	LockStatusMonitor *lockhub.LockStatusMonitor
 }
 
 func (controller *SmartLockController)open(c *gin.Context){
@@ -31,7 +33,7 @@ func (controller *SmartLockController)open(c *gin.Context){
 		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
 		c.IndentedJSON(http.StatusOK, rsp)
 		return
-  }	
+  	}	
 
 	if rep.List==nil || len(*rep.List)==0 {
 		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
@@ -45,9 +47,10 @@ func (controller *SmartLockController)open(c *gin.Context){
 		locksField,_:=row["locks"].(map[string]interface{})
 		locksList,_:=locksField["list"].([]interface{})
 		for _,lockItem:=range locksList {
-			log.Println(lockItem)
+			//log.Println(lockItem)
 			lockID:=lockItem.(map[string]interface{})["id"].(string)
-			err:=controller.LockOperator.Open(lockID)
+			//err:=controller.LockOperator.Open(lockID)
+			err:=controller.LockStatusMonitor.Open(header.Token,lockID)
 			if err!=common.ResultSuccess {
 				rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
 				c.IndentedJSON(http.StatusOK, rsp)
@@ -105,7 +108,7 @@ func (controller *SmartLockController)writekey(c *gin.Context){
 	log.Println("SmartLockController end writekey")
 }
 
-func (controller *SmartLockController)syncLockList(c *gin.Context){
+/*func (controller *SmartLockController)syncLockList(c *gin.Context){
 	log.Println("SmartLockController start syncLockList")
 
 	var header crv.CommonHeader
@@ -118,6 +121,30 @@ func (controller *SmartLockController)syncLockList(c *gin.Context){
 	}	
 
 	err:=controller.LockOperator.SyncLockList(header.Token)
+	if err!=common.ResultSuccess {
+		rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		return
+	}
+
+	rsp:=common.CreateResponse(nil,nil)
+	c.IndentedJSON(http.StatusOK, rsp)
+	log.Println("SmartLockController end syncLockList")
+}*/
+
+func (controller *SmartLockController)syncLockList(c *gin.Context){
+	log.Println("SmartLockController start syncLockList")
+
+	var header crv.CommonHeader
+	if err := c.ShouldBindHeader(&header); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end writekey with error")
+		return
+	}	
+
+	err:=controller.LockStatusMonitor.UpdateLockList(header.Token)
 	if err!=common.ResultSuccess {
 		rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
 		c.IndentedJSON(http.StatusOK, rsp)

@@ -23,16 +23,24 @@ type mqttConf struct {
 
 type crvConf struct {
 	Server string `json:"server"`
-  User string `json:"user"`
-  Password string `json:"password"`
-  AppID string `json:"appID"`
+    User string `json:"user"`
+    Password string `json:"password"`
+    AppID string `json:"appID"`
 	Token string `json:"token"`
+}
+
+type lockMonitorConf struct {
+	HubPort string `json:"hubPort"`
+	Interval string `json:"interval"`
+	BatchInterval string `json:"batchInterval"`
+	Timeout string `json:"timeout"`
 }
 
 type Config struct {
 	Service serviceConf `json:"service"`
 	MQTT mqttConf `json:"mqtt"`
 	CRV crvConf `json:"crv"`
+	Monitor lockMonitorConf `json:"lockMonitor"`
 }
 
 var gConfig Config

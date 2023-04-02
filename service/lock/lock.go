@@ -15,7 +15,7 @@ const (
 	OPER_DELAY="BSYS"  //闭锁延时
 	OPER_STATUS="MSZT"  //门锁状态
 	OPER_GETID ="SHSC"  //锁号上传
-	OPER_ZZSS = "ZTSS"  //状态上送
+	OPER_ZTSS = "ZTSS"  //状态上送
 	OPER_SHSS = "SHSS"  //锁号上送
 )
 
@@ -113,12 +113,12 @@ func (lockOperator *LockOperator)DealLockOperation(opMsg []byte){
 		return
 	}
 
-	if op.OperType==OPER_ZZSS {
-		lockOperator.DealZZSS(&op)
+	if op.OperType==OPER_ZTSS {
+		lockOperator.DealZTSS(&op)
 	}
 }
 
-func (lockOperator *LockOperator)DealZZSS(op *OperParam){
+func (lockOperator *LockOperator)DealZTSS(op *OperParam){
 	if op.Data!=nil && len(op.Data)>0 {
 		lockList:=make([]map[string]interface{},len(op.Data))
 		for index,lockItem:=range op.Data {

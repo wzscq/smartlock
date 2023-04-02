@@ -8,6 +8,7 @@ import (
 	"smartlockservice/crv"
 	"smartlockservice/lock"
 	"smartlockservice/lockservice"
+	"smartlockservice/lockhub"
 	"log"
 	"os"
 )
@@ -30,9 +31,9 @@ func main() {
 		AllowHeaders:     []string{"*"},
 		ExposeHeaders:    []string{"*"},
 		AllowCredentials: true,
-  }))
+  	}))
 
-	//crvClinet 用于到crvframeserver的请求
+   	//crvClinet 用于到crvframeserver的请求
 	crvClinet:=&crv.CRVClient{
 		Server:conf.CRV.Server,
 		Token:conf.CRV.Token,
@@ -48,7 +49,17 @@ func main() {
 		//Handler:&busiModule,
 		ClientID:conf.MQTT.ClientID,
 	}
+
+	lockStatusMonitor:=&lockhub.LockStatusMonitor{
+		CRVClient:crvClinet,
+		MQTTClient:mqttClient,
+		Interval:conf.Monitor.Interval,
+		BatchInterval:conf.Monitor.BatchInterval,
+		HubPort:conf.Monitor.HubPort,
+		Timeout:conf.Monitor.Timeout,
+	}
 	
+	lockStatusMonitor.UpdateLockList("")
 	lockOperator:=&lock.LockOperator{
 		MQTTClient:mqttClient,
 		AcceptTopic:conf.MQTT.AcceptTopic,
@@ -60,9 +71,13 @@ func main() {
 
 	slController:=&lockservice.SmartLockController{
 		LockOperator:lockOperator,
+		LockStatusMonitor:lockStatusMonitor,
 	}
 
 	mqttClient.Init()
 	slController.Bind(router)
+	
+	go lockStatusMonitor.StartMonitor()
+		
 	router.Run(conf.Service.Port) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
