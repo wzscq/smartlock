@@ -78,6 +78,6 @@ func main() {
 	slController.Bind(router)
 	
 	go lockStatusMonitor.StartMonitor()
-		
+	
 	router.Run(conf.Service.Port) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

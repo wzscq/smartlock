@@ -44,13 +44,14 @@ func (controller *SmartLockController)open(c *gin.Context){
 
 	//发送消息
 	for _,row:=range *rep.List {
+		closeDelay,_:=row["closeDelay"].(string)
 		locksField,_:=row["locks"].(map[string]interface{})
 		locksList,_:=locksField["list"].([]interface{})
 		for _,lockItem:=range locksList {
 			//log.Println(lockItem)
 			lockID:=lockItem.(map[string]interface{})["id"].(string)
 			//err:=controller.LockOperator.Open(lockID)
-			err:=controller.LockStatusMonitor.Open(header.Token,lockID)
+			err:=controller.LockStatusMonitor.Open(header.Token,lockID,closeDelay)
 			if err!=common.ResultSuccess {
 				rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
 				c.IndentedJSON(http.StatusOK, rsp)

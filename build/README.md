@@ -43,3 +43,14 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
    注意这里修改了数据库表sl_lock_status_record.status字段长度从2改到了3
    升级时需要替换sl_lock_status_record模型配置
 4、下发开锁指令时直接通过tcp方式下发
+
+2023-04-05 细节改进
+1、listview的数据排序按照时间倒序
+    修改相关视图的默认排序字段配置，用last_udpate字段倒序
+    sl_application
+    sl_key_authorization
+    sl_lock_authorization
+2、下发开锁指令时，数据库中的锁的编号是10进制的，需要转换为16进制
+3、远程开锁的闭锁延时允许再开锁时指定，下拉选择，选项包括：10s、30s、60s
+    修改模型sl_lock_authorization，增加闭锁延时字段close_delay
+    修改开锁接口逻辑，下发开锁指令前先下发闭锁延时指令

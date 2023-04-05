@@ -245,7 +245,7 @@ func (lsm *LockStatusMonitor)UpdateLockList(token string)(int){
 	return common.ResultSuccess
 }
 
-func (lsm *LockStatusMonitor)Open(token,lockID string)(int){
+func (lsm *LockStatusMonitor)Open(token,lockID,closeDelay string)(int){
 	//获取锁列表
 	filter:=&map[string]interface{}{
 		"id":lockID,
@@ -260,7 +260,13 @@ func (lsm *LockStatusMonitor)Open(token,lockID string)(int){
 	}
 
 	lockStatus:=lockStatusList[0]
-	cmd:=Command{
+	cmdCloseDelay:=Command{
+		CmdType:CMD_TYPE_DELAY,
+		LockNo:lockStatus.LockID,
+		Param:closeDelay,
+	}
+
+	cmdOpen:=Command{
 		CmdType:CMD_TYPE_OPEN,
 		LockNo:lockStatus.LockID,
 		Param:"000",
@@ -271,10 +277,19 @@ func (lsm *LockStatusMonitor)Open(token,lockID string)(int){
 	if len(lockStatus.MasterHub)>0 {
 		server:=lockStatus.MasterHub+":"+lsm.HubPort
 		var err error
-		cmd.Return,err=SendCommand(server,cmd.GetCommandStr(),timeoutDuration)
+		
+		//set close delay
+		cmdCloseDelay.Return,err=SendCommand(server,cmdCloseDelay.GetCommandStr(),timeoutDuration)
+		if err!=nil {
+			log.Println("SendCommand error:",err)
+		}
+		log.Println(cmdCloseDelay.Return)
+
+		//open
+		cmdOpen.Return,err=SendCommand(server,cmdOpen.GetCommandStr(),timeoutDuration)
 		if err == nil {
-			log.Println(cmd.Return)
-			retVal:=cmd.GetRetVal()
+			log.Println(cmdOpen.Return)
+			retVal:=cmdOpen.GetRetVal()
 			log.Println(retVal)
 			return common.ResultSuccess
 		} else {
@@ -286,10 +301,17 @@ func (lsm *LockStatusMonitor)Open(token,lockID string)(int){
 	if len(lockStatus.SlaveHub)>0 {
 		server:=lockStatus.SlaveHub+":"+lsm.HubPort
 		var err error
-		cmd.Return,err=SendCommand(server,cmd.GetCommandStr(),timeoutDuration)
+		//set close delay
+		cmdCloseDelay.Return,err=SendCommand(server,cmdCloseDelay.GetCommandStr(),timeoutDuration)
+		if err!=nil {
+			log.Println("SendCommand error:",err)
+		}
+		log.Println(cmdCloseDelay.Return)
+		
+		cmdOpen.Return,err=SendCommand(server,cmdOpen.GetCommandStr(),timeoutDuration)
 		if err == nil {
-			log.Println(cmd.Return)
-			retVal:=cmd.GetRetVal()
+			log.Println(cmdOpen.Return)
+			retVal:=cmdOpen.GetRetVal()
 			log.Println(retVal)
 			return common.ResultSuccess
 		} else {
