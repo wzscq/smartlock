@@ -5,6 +5,7 @@ import (
     "net"
 	"sync"
 	"time"
+    "strings"
 )
 
 var connect_mutex sync.Mutex
@@ -38,6 +39,10 @@ func SendCommand(server,cmd string,timeoutDuration time.Duration)(string,error){
         return "",err
     }
     response := string(buffer[:length])
+    log.Println("receive buffer", response)
+    resList:=strings.SplitAfter(response,"END")
+    log.Println("receive resList", resList,len(resList))
+    response=resList[len(resList)-2]
     log.Println("receive response：", response)
 	conn.Close()
 	connect_mutex.Unlock()

@@ -44,7 +44,7 @@ func (controller *SmartLockController)open(c *gin.Context){
 
 	//发送消息
 	for _,row:=range *rep.List {
-		closeDelay,_:=row["closeDelay"].(string)
+		closeDelay,_:=row["close_delay"].(string)
 		locksField,_:=row["locks"].(map[string]interface{})
 		locksList,_:=locksField["list"].([]interface{})
 		for _,lockItem:=range locksList {
