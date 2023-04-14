@@ -48,6 +48,7 @@ func main() {
 		SendTopic:conf.MQTT.SendTopic,
 		//Handler:&busiModule,
 		ClientID:conf.MQTT.ClientID,
+		KeyControlAcceptTopic:conf.MQTT.KeyControlAcceptTopic,
 	}
 
 	lockStatusMonitor:=&lockhub.LockStatusMonitor{

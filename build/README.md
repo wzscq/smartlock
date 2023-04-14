@@ -54,3 +54,16 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 3、远程开锁的闭锁延时允许再开锁时指定，下拉选择，选项包括：10s、30s、60s
     修改模型sl_lock_authorization，增加闭锁延时字段close_delay
     修改开锁接口逻辑，下发开锁指令前先下发闭锁延时指令
+
+2023-04-12 细节改进
+1、申请授权中的2个时间去掉，日期改为带时间的日期
+    修改模型sl_application的相关配置
+    后端服务逻辑修改
+2、智能钥匙授权的时候需要弹出对话框，让用户选择一个钥匙管理机
+    修改模型sl_application的相关配置
+    后端服务逻辑修改
+
+2023-04-14 增加钥匙授权记录功能
+1、修改sl_key_authorization模型表结构和对应配置
+2、后台逻辑增加mqtt收取信息并入库的功能
+

@@ -14,6 +14,7 @@ const (
 
 type eventHandler interface {
 	DealLockOperation(opMsg []byte)
+	DealKeyControllerOperation(opMsg []byte)
 }
 
 type MQTTClient struct {
@@ -21,6 +22,7 @@ type MQTTClient struct {
 	User string
 	Password string
 	SendTopic string
+	KeyControlAcceptTopic string
 	ClientID string
 	Handler eventHandler
 	Client mqtt.Client
@@ -70,6 +72,13 @@ func (mqc *MQTTClient)onResponse(Client mqtt.Client, msg mqtt.Message){
 	mqc.Handler.DealLockOperation(msg.Payload())
 }
 
+func (mqc *MQTTClient)onKeyControlResponse(Client mqtt.Client, msg mqtt.Message){
+	log.Println("MQTTClient onKeyControlResponse ",msg.Topic())
+	josnStr:=string(msg.Payload())
+	log.Println("MQTTClient onKeyControlResponse ",josnStr)
+	mqc.Handler.DealKeyControllerOperation(msg.Payload())
+}
+
 func (mqc *MQTTClient)Publish(topic,content string)(int){
 	if mqc.Client == nil {
 		return common.ResultMqttClientError
@@ -83,4 +92,5 @@ func (mqc *MQTTClient)Publish(topic,content string)(int){
 func (mqc *MQTTClient) Init(){
 	mqc.Client=mqc.getClient()
 	mqc.Client.Subscribe(mqc.SendTopic,0,mqc.onResponse)
+	mqc.Client.Subscribe(mqc.KeyControlAcceptTopic,0,mqc.onKeyControlResponse)
 }

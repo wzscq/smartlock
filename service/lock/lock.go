@@ -19,6 +19,19 @@ const (
 	OPER_SHSS = "SHSS"  //锁号上送
 )
 
+const (
+	KC_OPER_AUTHREC="APPAuthRec"
+)
+
+type KCOperParm struct {
+	OperType string `json:"commandType"`
+	ApplicationID string `json:"applicationID"`
+	KeyControllerID string `json:"keyControllerID"`
+	KeyID string `json:"keyID"`
+	Status string `json:"status"`
+	Message string `json:"message"`
+}
+
 type OperParam struct {
 	LockID string `json:"lock_number"`
 	OperType string `json:"command_type"`
@@ -65,8 +78,8 @@ var applicatonFields=[]map[string]interface{}{
 	},
 	{"field":"start_date"},
 	{"field":"end_date"},
-	{"field":"start_time"},
-	{"field":"end_time"},
+	//{"field":"start_time"},
+	//{"field":"end_time"},
 	{"field":"description"},
 	{"field":"status"},
 	{"field":"approval_comments"},
@@ -118,6 +131,37 @@ func (lockOperator *LockOperator)DealLockOperation(opMsg []byte){
 	}
 }
 
+func (lockOperator *LockOperator)DealKeyControllerOperation(opMsg []byte){
+	var op KCOperParm
+	if err := json.Unmarshal(opMsg, &op); err != nil {
+		log.Println(err)
+		return
+	}
+
+	if op.OperType==KC_OPER_AUTHREC {
+		lockOperator.DealAuthRec(&op)
+	}
+}
+
+func (lockOperator *LockOperator)DealAuthRec(op *KCOperParm){
+	recList:=[]map[string]interface{}{
+		map[string]interface{}{
+			"key_controller_id":op.KeyControllerID,
+			"key_id":op.KeyID,
+			"application_id":op.ApplicationID,
+			"status":op.Status,
+			"message":op.Message,
+			"_save_type":"create",
+		},
+	}
+	
+	saveReq:=&crv.CommonReq{
+		ModelID:"sl_key_authorization",
+		List:&recList,
+	}
+	lockOperator.CRVClient.Save(saveReq,"")
+}
+
 func (lockOperator *LockOperator)DealZTSS(op *OperParam){
 	if op.Data!=nil && len(op.Data)>0 {
 		lockList:=make([]map[string]interface{},len(op.Data))
@@ -137,7 +181,7 @@ func (lockOperator *LockOperator)DealZTSS(op *OperParam){
 	}
 }
 
-func (lockOperator *LockOperator)WriteKey(appID,token string)(int){
+func (lockOperator *LockOperator)WriteKey(keyControllerID,appID,token string)(int){
 	//查询数据
 	commonRep:=crv.CommonReq{
 		ModelID:"sl_application",
@@ -162,7 +206,7 @@ func (lockOperator *LockOperator)WriteKey(appID,token string)(int){
   jsonStr := string(bytes)
 
 	//发送mq消息	
-	commonErr=lockOperator.MQTTClient.Publish(lockOperator.KeyControlSendTopic,jsonStr)	
+	commonErr=lockOperator.MQTTClient.Publish(lockOperator.KeyControlSendTopic+"/"+keyControllerID,jsonStr)	
 	if commonErr!=common.ResultSuccess {
 		return commonErr
 	}

@@ -91,13 +91,24 @@ func (controller *SmartLockController)writekey(c *gin.Context){
 	if rep.SelectedRowKeys ==nil || len(*rep.SelectedRowKeys)==0 {
 		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
 		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("SmartLockController end writekey with error：request SelectedRowKeys is empty")
+		return
+	}
+
+	if rep.List==nil || len(*rep.List)==0 {
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
 		log.Println("SmartLockController end writekey with error：request list is empty")
 		return
 	}
 
 	//发送消息
+	//取出申请记录ID
 	applicationID:=(*rep.SelectedRowKeys)[0]
-	err:=controller.LockOperator.WriteKey(applicationID,header.Token)
+	//取出对应钥匙管理机的ID
+	keyControllerID:=(*rep.List)[0]["key_controller_id"].(string)
+	log.Println("keyControllerID:",keyControllerID)
+	err:=controller.LockOperator.WriteKey(keyControllerID,applicationID,header.Token)
 	if err!=common.ResultSuccess {
 		rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
 		c.IndentedJSON(http.StatusOK, rsp)
