@@ -1,5 +1,16 @@
 # crv_frame_build
 
+#更新镜像流程
+1、停止并删除原有镜像实例
+    docker stop smartlock
+    docker rm smartlock
+2、删除原有镜像
+    docker rmi smartlock:0.1.0
+3、加载新的镜像
+    docker load -i smartlockXXXXX.tar
+4、启动实例
+    docker run 。。。
+
 #导出镜像包命令
 docker save -o smartlock.tar wangzhsh/smartlock:0.1.0
 #导入镜像包命令
@@ -66,4 +77,7 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 2023-04-14 增加钥匙授权记录功能
 1、修改sl_key_authorization模型表结构和对应配置
 2、后台逻辑增加mqtt收取信息并入库的功能
+
+2023-04-23 应对现场hub可能存在环路问题
+1、修改发送指令的逻辑，连接hub后先收取旧的数据并丢弃，然后发出命令，再收取反馈信息。
 
