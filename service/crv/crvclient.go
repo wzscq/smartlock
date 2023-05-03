@@ -47,6 +47,11 @@ type Pagination struct {
     PageSize int `json:"pageSize"` 
 }
 
+type Sorter struct {
+	Field string `json:"field"`
+	Order string `json:"order"`
+}
+
 type CommonReq struct {
 	ModelID string `json:"modelID"`
 	ViewID *string `json:"viewID"`
@@ -56,7 +61,7 @@ type CommonReq struct {
 	UserID *string `json:"userID"`
 	AppDB *string `json:"appDB"`
 	UserRoles *string `json:"userRoles"`
-	//Sorter *[]sorter `json:"sorter"`
+	Sorter *[]Sorter `json:"sorter"`
 	SelectedRowKeys *[]string `json:"selectedRowKeys"`
 	Pagination *Pagination `json:"pagination"`
 }

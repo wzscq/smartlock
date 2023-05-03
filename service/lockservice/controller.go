@@ -68,6 +68,62 @@ func (controller *SmartLockController)open(c *gin.Context){
 	log.Println("SmartLockController end open")
 }
 
+func (controller *SmartLockController)openBatch(c *gin.Context){
+	log.Println("SmartLockController start openBatch")
+	
+	var header crv.CommonHeader
+	if err := c.ShouldBindHeader(&header); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end SmartLockController with error")
+		return
+	}	
+	
+	var rep crv.CommonReq
+	if err := c.BindJSON(&rep); err != nil {
+		log.Println(err)
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end SmartLockController with error")
+		return
+  	}	
+
+	if rep.List==nil || len(*rep.List)==0 {
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end SmartLockController with error：request list is empty")
+		return
+	}
+
+	//发送消息
+	for _,row:=range *rep.List {
+		closeDelay,_:=row["close_delay"].(string)
+		locksField,_:=row["locks"].(map[string]interface{})
+		locksList,_:=locksField["list"].([]interface{})
+		lockIDs:=[]string{}
+		for _,lockItem:=range locksList {
+			//log.Println(lockItem)
+			lockID:=lockItem.(map[string]interface{})["id"].(string)
+			lockIDs=append(lockIDs,lockID)			
+		}
+		
+		err:=controller.LockStatusMonitor.OpenBatch(header.Token,closeDelay,lockIDs)
+		if err!=common.ResultSuccess {
+			rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
+			c.IndentedJSON(http.StatusOK, rsp)
+			return
+		}
+	}
+
+	//保存数据
+	controller.LockOperator.CRVClient.Save(&rep,header.Token)
+
+	rsp:=common.CreateResponse(nil,nil)
+	c.IndentedJSON(http.StatusOK, rsp)
+	log.Println("SmartLockController end openBatch")
+}
+
 func (controller *SmartLockController)writekey(c *gin.Context){
 	log.Println("SmartLockController start writekey")
 	
@@ -174,4 +230,5 @@ func (controller *SmartLockController) Bind(router *gin.Engine) {
 	router.POST("/open", controller.open)
 	router.POST("/writekey", controller.writekey)
 	router.POST("/syncLockList", controller.syncLockList)
+	router.POST("/openBatch", controller.openBatch)
 }

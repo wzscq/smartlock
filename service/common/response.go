@@ -27,7 +27,7 @@ const (
 	ResultSaveDataError = 10100010
 	ResultCacheSendRecError = 10100011
 	ResultJonsMarshalError = 10000043
-	ResultOpenLockError = 10000044
+	ResultOpenLockError = 20000044
 )
 
 var errMsg = map[int]CommonRsp{

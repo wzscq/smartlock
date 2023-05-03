@@ -81,3 +81,7 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 2023-04-23 应对现场hub可能存在环路问题
 1、修改发送指令的逻辑，连接hub后先收取旧的数据并丢弃，然后发出命令，再收取反馈信息。
 
+2023-05-03 优化开锁速度
+1、增加了批量开锁操作openBatch
+2、需要修改开锁按钮的配置和external_api配置
+
