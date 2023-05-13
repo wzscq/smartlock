@@ -85,3 +85,13 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 1、增加了批量开锁操作openBatch
 2、需要修改开锁按钮的配置和external_api配置
 
+2023-05-07
+1、修改了报表中第三个chat图的取数逻辑，增加了基于区域的过滤参数，让下方的折线图和第一个饼图数据保持一致
+2、sl_lock模型配置中去掉了同步锁信息按钮
+3、菜单中去掉系统管理下的日志管理和文件管理菜单
+4、修改了框架中不可用控件的背景颜色
+
+2023-05-13
+1、修改了dashboard的配置，解决了统计数据不正确的问题，包括开锁状态错误，按日期统计开锁次数时没有按日期分组汇总，优化了对日期条件的框选方式
+2、sl_lock_authorization、sl_key_authorization、sl_application补充了快速检索字段
+3、框架增加了数据校验功能，sl_application补充了对结束日期必须大于开始日期的校验,sl_lock补充了主用网关和备用网关不能相同的校验
