@@ -51,6 +51,17 @@ func GetLockNoHexStr(lockNoDecStr string)(string){
 	return lockNoHex
 }
 
+func GetLockNoDecStr(lockNoHexStr string)(string){
+	//将lockNoHexStr转换为lockNoDecStr
+	lockNoDec, _ := strconv.ParseInt(lockNoHexStr, 16, 64)
+	lockNoDecStr := strconv.FormatInt(lockNoDec, 10)
+	return lockNoDecStr
+}
+
+func GetCommandReturnType(cmdType string)(string){
+	return fmt.Sprintf("AT+%sR",cmdType)
+}
+
 func (cmd *Command)GetCommandStr()(string){
 	lockNoHex:=GetLockNoHexStr(cmd.LockNo)
 	return fmt.Sprintf("AT+%s=%s%sEND",cmd.CmdType,lockNoHex,cmd.Param)

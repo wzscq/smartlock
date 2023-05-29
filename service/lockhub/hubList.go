@@ -16,6 +16,7 @@ var	hubFields=[]map[string]interface{}{
 type HubItem struct {
 	ID string
 	IP string
+	HubClient *HubClient
 }
 
 type HubList struct {
@@ -57,6 +58,13 @@ func (hl *HubList)load(crvClient * crv.CRVClient,token string){
 			ID:resMap["id"].(string),
 			IP:resMap["ip"].(string),
 		}
+		hubClient:=&HubClient{
+			HubItem:hub,
+			Port:hl.Port,
+			Connected:false,
+			CommandResultHandler:hl.CommandResultHandler,
+		}
+		hub.HubClient=hubClient
 		hl.HubMap[hub.ID]=hub
 	}
 }
@@ -67,11 +75,5 @@ func (hl *HubList)getHubClient(id string)(*HubClient){
 		return nil
 	}
 
-	hubClient:=&HubClient{
-		HubItem:hub,
-		Port:hl.Port,
-		Connected:false,
-		CommandResultHandler:hl.CommandResultHandler,
-	}
-	return hubClient
+	return hub.HubClient
 }
