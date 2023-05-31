@@ -4,14 +4,13 @@ import (
 	"smartlockservice/crv"
 	"smartlockservice/common"
 	"log"
+	"time"
 )
-
 
 var	hubFields=[]map[string]interface{}{
 							{"field":"id"},
 							{"field":"ip"},
 						}
-
 
 type HubItem struct {
 	ID string
@@ -22,13 +21,14 @@ type HubItem struct {
 type HubList struct {
 	HubMap map[string]HubItem
 	Port string
+	Timeout string
 	CommandResultHandler *CommandResultHandler
 }
 
 func (hl *HubList)load(crvClient * crv.CRVClient,token string){
 	//获取锁列表
 	commonRep:=crv.CommonReq{
-		ModelID:"sl_hub",
+		ModelID:"sl_lock_hub",
 		Fields:&hubFields,
 	}
 
@@ -48,6 +48,9 @@ func (hl *HubList)load(crvClient * crv.CRVClient,token string){
 		return
 	}
 
+	//根据timeout解析为duration
+	timeoutDuration,_:=time.ParseDuration(hl.Timeout)
+
 	for _,res:=range resLst {
 		resMap,ok:=res.(map[string]interface{})
 		if !ok {
@@ -62,6 +65,7 @@ func (hl *HubList)load(crvClient * crv.CRVClient,token string){
 			HubItem:hub,
 			Port:hl.Port,
 			Connected:false,
+			Timeout:timeoutDuration,
 			CommandResultHandler:hl.CommandResultHandler,
 		}
 		hub.HubClient=hubClient

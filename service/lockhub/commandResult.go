@@ -43,9 +43,11 @@ func (crh *CommandResultHandler)GetCommandResult(resultStr string)(* CommandResu
 	}
 	cmdType=CMD_TYPE_STATUS
 	//第二部分是锁号和状态，最后三位是状态，其它位是锁号
-	lockNoHexStr:=resultParts[1][0:len(resultParts[1])-3]
+	lockNoHexStr:=resultParts[1][0:len(resultParts[1])-6]
 	lockNoDecStr:=GetLockNoDecStr(lockNoHexStr)
-	status:=resultParts[1][len(resultParts[1])-3:]
+	status:=resultParts[1][len(resultParts[1])-6:len(resultParts[1])-3]
+
+	log.Println("resultParts[1]",resultParts[1],"cmdType:",cmdType," lockNoHexStr:",lockNoHexStr," lockNoDecStr:",lockNoDecStr," status:",status)
 
 	//将锁号和状态组装成CommandResult
 	cmdResult:=&CommandResult{

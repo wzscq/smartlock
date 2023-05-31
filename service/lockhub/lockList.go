@@ -85,11 +85,13 @@ func (ll *LockList)UpdateLockStatus(result *CommandResult){
 		return
 	}
 
+	log.Println("lockItem.ID:",lockItem.ID,"LockNo ",result.LockNo," lockItem.Status:",lockItem.Status,"result.Result:",result.Result)
 	//查看锁的状态和返回结果的状态是否一致，如果一致则不需要更新
 	if lockItem.Status==result.Result {
 		return
 	}
 
+	log.Println("save sl_lock_status_record ...")
 	lockItem.Status=result.Result
 	//更新状态到数据库
 	saveReq:=&crv.CommonReq{
@@ -106,9 +108,9 @@ func (ll *LockList)UpdateLockStatus(result *CommandResult){
 }
 
 func (ll *LockList)FindLock(lockNo string) *LockItem {
-	for _,lockItem:=range ll.Locks {
+	for index,lockItem:=range ll.Locks {
 		if lockItem.ID == lockNo {
-			return &lockItem
+			return &ll.Locks[index]
 		}
 	}
 

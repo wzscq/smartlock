@@ -25,6 +25,7 @@ func (lc *LockController)Init(){
 
 	lc.HubList=&HubList{
 		HubMap:make(map[string]HubItem),
+		Timeout:lc.Timeout,
 		Port:lc.HubPort,
 		CommandResultHandler:&CommandResultHandler{
 			LockList:lc.LockList,
@@ -60,7 +61,7 @@ func (lc *LockController)StartMonitor(){
 			//send by master hub
 			hubClient:=lc.HubList.getHubClient(lockItem.MasterHub)
 			if hubClient!=nil {
-				ok:=hubClient.SendCommand(cmd)
+				ok:=hubClient.SendCommand(cmd,false)
 				if ok {
 					continue
 				}
@@ -70,7 +71,7 @@ func (lc *LockController)StartMonitor(){
 			//send by slaver hub
 			hubClient=lc.HubList.getHubClient(lockItem.SlaverHub)
 			if hubClient!=nil {
-				hubClient.SendCommand(cmd)
+				hubClient.SendCommand(cmd,false)
 			} else {
 				log.Println("SlaverHub not found:",lockItem.SlaverHub)
 			}
@@ -110,11 +111,12 @@ func (lc *LockController)OpenLocks(closeDelay string,lockIDs []string)(int){
 		//获取锁所在的主从集线器
 		hubClient:=lc.HubList.getHubClient(lockItem.MasterHub)
 		if hubClient!=nil {
-			hubClient.SendCommand(cmdCloseDelay)
-			ok:=hubClient.SendCommand(cmdOpen)
+			cmds:=[]Command{cmdCloseDelay,cmdOpen}
+			ok:=hubClient.SendCommands(cmds,true)
 			if ok {
 				continue
 			}
+			log.Println("MasterHub not connected")
 		} else {
 			log.Println("MasterHub not found:",lockItem.MasterHub)
 			return common.ResultOpenLockError
@@ -122,9 +124,10 @@ func (lc *LockController)OpenLocks(closeDelay string,lockIDs []string)(int){
 		//send by slaver hub
 		hubClient=lc.HubList.getHubClient(lockItem.SlaverHub)
 		if hubClient!=nil {
-			hubClient.SendCommand(cmdCloseDelay)
-			ok:=hubClient.SendCommand(cmdOpen)
+			cmds:=[]Command{cmdCloseDelay,cmdOpen}
+			ok:=hubClient.SendCommands(cmds,true)
 			if !ok {
+				log.Println("SlaverHub not connected")
 				return common.ResultOpenLockError
 			}
 		} else {

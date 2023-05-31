@@ -6,6 +6,8 @@ import (
 	"sync"
 	"time"
   "strings"
+	"errors"
+
 )
 
 type SendCmdListItem struct {
@@ -16,6 +18,7 @@ type SendCmdListItem struct {
 type HubClient struct {
 	HubItem HubItem
 	Port string
+	Timeout time.Duration
 	Connected bool
 	Conn net.Conn
 	SendCmdListItem *SendCmdListItem
@@ -27,7 +30,51 @@ func (hc *HubClient)StartSendRecive(){
 	go hc.SendReceive()
 }
 
-func (hc *HubClient)SendCommand(cmd Command)(bool){
+func (hc *HubClient)SendCommands(cmds []Command,first bool)(bool){
+	hc.CMDMutex.Lock()
+  defer hc.CMDMutex.Unlock()
+	//如果没有连接，则先连接
+	if hc.Connected==false {
+		return false
+	}
+
+	var SendItems *SendCmdListItem
+	var lastItem *SendCmdListItem
+	//逐个添加到SendItems
+	for _,cmd:=range cmds {
+		if lastItem==nil {
+			SendItems=&SendCmdListItem{
+				CMD:cmd,
+			}
+			lastItem=SendItems
+		} else {
+			lastItem.Next=&SendCmdListItem{
+				CMD:cmd,
+			}
+			lastItem=lastItem.Next
+		}
+	}
+
+	//将发送命令放入队列
+	if hc.SendCmdListItem==nil {
+		hc.SendCmdListItem=SendItems
+	} else {
+		if first==true {
+			lastItem.Next=hc.SendCmdListItem
+			hc.SendCmdListItem=SendItems
+		} else {
+			item:=hc.SendCmdListItem
+			for item.Next!=nil {
+				item=item.Next
+			}
+			item.Next=SendItems
+		}
+	}
+	
+	return true
+}
+
+func (hc *HubClient)SendCommand(cmd Command,first bool)(bool){
 	hc.CMDMutex.Lock()
   defer hc.CMDMutex.Unlock()
 	//如果没有连接，则先连接
@@ -40,12 +87,20 @@ func (hc *HubClient)SendCommand(cmd Command)(bool){
 			CMD:cmd,
 		}
 	} else {
-		item:=hc.SendCmdListItem
-		for item.Next!=nil {
-			item=item.Next
-		}
-		item.Next=&SendCmdListItem{
-			CMD:cmd,
+		if first==true {
+			item:=&SendCmdListItem{
+				CMD:cmd,
+			}
+			item.Next=hc.SendCmdListItem
+			hc.SendCmdListItem=item
+		} else {
+			item:=hc.SendCmdListItem
+			for item.Next!=nil {
+				item=item.Next
+			}
+			item.Next=&SendCmdListItem{
+				CMD:cmd,
+			}
 		}
 	}
 
@@ -59,7 +114,7 @@ func (hc *HubClient)Connect()(bool){
 
 	var err error
 	server:=hc.HubItem.IP+":"+hc.Port
-	hc.Conn, err= net.DialTimeout("tcp", server,5*time.Second)
+	hc.Conn, err= net.DialTimeout("tcp", server,hc.Timeout)
 	if err != nil {
 		log.Println("connect to lockhub ",server, " error:", err)
 		return false
@@ -82,13 +137,13 @@ func (hc *HubClient)Send()(bool){
 	hc.CMDMutex.Lock()
 	defer hc.CMDMutex.Unlock()
 	
-	err:=hc.Conn.SetDeadline(time.Now().Add(5*time.Second))
+	err:=hc.Conn.SetDeadline(time.Now().Add(hc.Timeout))
 	if err != nil {
 		log.Println("send command set timeout error:", err) 
 		return false
 	}
 
-	for hc.SendCmdListItem!=nil {
+	if hc.SendCmdListItem!=nil {
 		cmd:=hc.SendCmdListItem.CMD
 		hc.SendCmdListItem=hc.SendCmdListItem.Next
 		cmdStr:=cmd.GetCommandStr()
@@ -105,8 +160,8 @@ func (hc *HubClient)Send()(bool){
 
 func (hc *HubClient)Receive()(bool){
 	// 接收数据
-	log.Println("receive response message ...") 
-	err:=hc.Conn.SetDeadline(time.Now().Add(5*time.Second))
+	log.Println("receive response message ...", hc.HubItem.IP) 
+	err:=hc.Conn.SetDeadline(time.Now().Add(hc.Timeout))
 	if err != nil {
 		log.Println("receive response set timeout error:", err) 
 		return false
@@ -118,8 +173,9 @@ func (hc *HubClient)Receive()(bool){
 			length, err := hc.Conn.Read(buffer[receiveLength:])
 			log.Println("receive response message :", length, err)
 			if err != nil {
-				if receiveLength<=0 && length<=0 {
-						return false
+				//如果不是超时错误，则报错返回
+				if !hc.isTimeoutError(err) {
+					return false
 				}
 				receiveLength+=length
 				break
@@ -132,6 +188,7 @@ func (hc *HubClient)Receive()(bool){
 			receiveLength+=length
 	}
 	
+	log.Println("receive response message length:",receiveLength)
 	response := string(buffer[:receiveLength])
 	log.Println("receive buffer", response)
 	resList:=strings.SplitAfter(response,"END")
@@ -155,7 +212,7 @@ func (hc *HubClient)SendReceive(){
 			//连接
 			ok:=hc.Connect()
 			if !ok {
-				time.Sleep(30*time.Second)
+				time.Sleep(10*time.Second)
 				continue
 			}
 		}
@@ -173,5 +230,13 @@ func (hc *HubClient)SendReceive(){
 		}
 		time.Sleep(5*time.Second)
 	}
+}
+
+func (hc *HubClient)isTimeoutError(err error) bool {
+	var netErr net.Error
+	if errors.As(err, &netErr) {
+			return netErr.Timeout()
+	}
+	return false
 }
 

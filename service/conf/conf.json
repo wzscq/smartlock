@@ -21,6 +21,6 @@
         "hubPort":"18100",
         "interval":"500ms",
         "batchInterval":"10s",
-        "timeout":"5s"
+        "timeout":"500ms"
     }
 }

@@ -70,15 +70,25 @@ func main() {
 
 	mqttClient.Handler=lockOperator
 
+	lockController:=&lockhub.LockController{
+		CRVClient:crvClinet,
+		Interval:conf.Monitor.Interval,
+		BatchInterval:conf.Monitor.BatchInterval,
+		HubPort:conf.Monitor.HubPort,
+		Timeout:conf.Monitor.Timeout,
+	}
+
 	slController:=&lockservice.SmartLockController{
 		LockOperator:lockOperator,
 		LockStatusMonitor:lockStatusMonitor,
+		LockController:lockController,
 	}
 
 	mqttClient.Init()
 	slController.Bind(router)
 	
-	go lockStatusMonitor.StartMonitor()
+	//go lockStatusMonitor.StartMonitor()
 	
+	lockController.Init()
 	router.Run(conf.Service.Port) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

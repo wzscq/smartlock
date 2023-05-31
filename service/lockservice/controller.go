@@ -13,6 +13,7 @@ import (
 type SmartLockController struct {
 	LockOperator *lock.LockOperator
 	LockStatusMonitor *lockhub.LockStatusMonitor
+	LockController *lockhub.LockController
 }
 
 func (controller *SmartLockController)open(c *gin.Context){
@@ -87,7 +88,7 @@ func (controller *SmartLockController)openBatch(c *gin.Context){
 		c.IndentedJSON(http.StatusOK, rsp)
 		log.Println("end SmartLockController with error")
 		return
-  	}	
+  }	
 
 	if rep.List==nil || len(*rep.List)==0 {
 		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
@@ -108,7 +109,8 @@ func (controller *SmartLockController)openBatch(c *gin.Context){
 			lockIDs=append(lockIDs,lockID)			
 		}
 		
-		err:=controller.LockStatusMonitor.OpenBatch(header.Token,closeDelay,lockIDs)
+		err:=controller.LockController.OpenLocks(closeDelay,lockIDs)
+		/*err:=controller.LockStatusMonitor.OpenBatch(header.Token,closeDelay,lockIDs)*/
 		if err!=common.ResultSuccess {
 			rsp:=common.CreateResponse(common.CreateError(err,nil),nil)
 			c.IndentedJSON(http.StatusOK, rsp)
@@ -218,6 +220,8 @@ func (controller *SmartLockController)syncLockList(c *gin.Context){
 		c.IndentedJSON(http.StatusOK, rsp)
 		return
 	}
+
+	controller.LockController.UpdateLockList()
 
 	rsp:=common.CreateResponse(nil,nil)
 	c.IndentedJSON(http.StatusOK, rsp)
