@@ -95,3 +95,12 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 1、修改了dashboard的配置，解决了统计数据不正确的问题，包括开锁状态错误，按日期统计开锁次数时没有按日期分组汇总，优化了对日期条件的框选方式
 2、sl_lock_authorization、sl_key_authorization、sl_application补充了快速检索字段
 3、框架增加了数据校验功能，sl_application补充了对结束日期必须大于开始日期的校验,sl_lock补充了主用网关和备用网关不能相同的校验
+
+2023-11-17 i6000接口
+1、数据库增加三个表存储工单相关信息
+    sl_work_ticket
+    sl_involve_system
+    sl_involve_device
+2、为新增加的表增加响应的模型配置
+3、增加菜单项打开工单信息页面
+4、后端逻辑增加从I6000获取工单的逻辑和响应接口
