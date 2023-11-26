@@ -33,8 +33,7 @@ type I6000Conf struct {
 	FindWorkTicket string `json:"findWorkTicket"`
 	SelectInvolveSystemInfo string `json:"selectInvolveSystemInfo"`
 	SelectInvolveDeviceInfo string `json:"selectInvolveDeviceInfo"`
-	AccessToken string `json:"accessToken"`
-	SignData string `json:"signData"`
+	GetSignDataUrl string `json:"getSignDataUrl"`
 	AllOrgIds []string `json:"allOrgIds"`
 	QueryInterval string `json:"queryInterval"`
 }

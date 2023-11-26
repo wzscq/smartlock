@@ -65,6 +65,13 @@ type FindWorkTicketResponse struct {
 	Data *WorkTicketResponseData `json:"data"`
 }
 
+type SignData struct {
+	SignData string `json:"signData"`
+	AccessToken string `json:"accessToken"`
+	Timestamp string `json:"timestamp"`
+	Status int `json:"status"`
+}
+
 type I6000Client struct {
 	CRVClient *crv.CRVClient
 	I6000Conf *common.I6000Conf
@@ -80,6 +87,34 @@ func (client *I6000Client) StartQueryWorkTicket() {
 		client.syncWorkTicket("")
 		time.Sleep(durationInterval)
 	}
+}
+
+func GetSingData(url string)(*SignData){
+	req,err:=http.NewRequest("GET",url,nil)
+	if err != nil {
+		log.Println("GetSingData error",err)
+		return nil
+	}	
+	resp, err := (&http.Client{}).Do(req)
+	if err != nil {
+		log.Println("GetSingData Do request error",err)
+		return nil
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 { 
+		log.Println("GetSingData StatusCode error",resp)
+		return nil
+	}
+
+	decoder := json.NewDecoder(resp.Body)
+	signData:=&SignData{}
+	err = decoder.Decode(signData)
+	if err != nil {
+		log.Println("GetSingData result decode failed [Err:%s]", err.Error())
+		return nil
+	}
+	return signData
 }
 
 func (client *I6000Client)getExistWorkTickets(workTickets *[]WorkTicketItem)(*[]string){
@@ -160,8 +195,13 @@ func (client *I6000Client)getWorkTicketSystems(id string)(*[]SystemInfoResponseD
 	}
 	
 	req.Header.Set("Content-Type","application/json")
-	req.Header.Set("AccessToken",client.I6000Conf.AccessToken)
-	req.Header.Set("signData",client.I6000Conf.SignData)
+	signData:=GetSingData(client.I6000Conf.GetSignDataUrl)
+	if signData==nil {
+		log.Println("I6000Client getWorkTicketSystems GetSingData error")
+		return nil
+	}
+	req.Header.Set("AccessToken",signData.AccessToken)
+	req.Header.Set("signData",signData.SignData)
 	
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
@@ -193,8 +233,13 @@ func (client *I6000Client)getWorkTicketDevices(id string)(*[]SystemInfoResponseD
 	}
 	
 	req.Header.Set("Content-Type","application/json")
-	req.Header.Set("AccessToken",client.I6000Conf.AccessToken)
-	req.Header.Set("signData",client.I6000Conf.SignData)
+	signData:=GetSingData(client.I6000Conf.GetSignDataUrl)
+	if signData==nil {
+		log.Println("I6000Client getWorkTicketDevices GetSingData error")
+		return nil
+	}
+	req.Header.Set("AccessToken",signData.AccessToken)
+	req.Header.Set("signData",signData.SignData)
 	
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
@@ -355,8 +400,13 @@ func (client *I6000Client)getWorkTicketByPage(requestBody *FindWorkTicketRequest
 	}
 	
 	req.Header.Set("Content-Type","application/json")
-	req.Header.Set("AccessToken",client.I6000Conf.AccessToken)
-	req.Header.Set("signData",client.I6000Conf.SignData)
+	signData:=GetSingData(client.I6000Conf.GetSignDataUrl)
+	if signData==nil {
+		log.Println("I6000Client getWorkTicketByPage GetSingData error")
+		return nil
+	}
+	req.Header.Set("AccessToken",signData.AccessToken)
+	req.Header.Set("signData",signData.SignData)
 	
 	resp, err := (&http.Client{}).Do(req)
 	if err != nil {
