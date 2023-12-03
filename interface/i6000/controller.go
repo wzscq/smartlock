@@ -34,8 +34,29 @@ func (controller *I6000Controller) syncWorkTicket(c *gin.Context) {
 	log.Println("I6000Controller end syncWorkTicket")
 }
 
+func (controller *I6000Controller) Test(c *gin.Context) {
+	log.Println("I6000Controller start Test")
+	var wtItem WorkTicketItem
+	if err := c.BindJSON(&wtItem); err != nil {
+		log.Println(err.Error())
+		rsp:=common.CreateResponse(common.CreateError(common.ResultWrongRequest,nil),nil)
+		c.IndentedJSON(http.StatusOK, rsp)
+		log.Println("end Test with error")
+		return
+  } else {
+		wtItems:=&[]WorkTicketItem{
+			wtItem,
+		}
+		controller.I6000Client.saveNewWorkTickets(wtItems)
+	}
+	rsp:=common.CreateResponse(nil,nil)
+	c.IndentedJSON(http.StatusOK, rsp)
+	log.Println("I6000Controller end Test")
+}
+
 //Bind bind the controller function to url
 func (controller *I6000Controller) Bind(router *gin.Engine) {
 	log.Println("Bind I6000Controller")
 	router.POST("/syncWorkTicket", controller.syncWorkTicket)
+	router.POST("/test", controller.Test)
 }

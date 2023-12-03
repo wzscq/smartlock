@@ -12,7 +12,10 @@
         "selectInvolveSystemInfo":"http://21.11.7.20/i6000-dyj-service/api/wf/i6000-api/selectInvolveSystemInfo",
         "selectInvolveDeviceInfo":"http://21.11.7.20/i6000-dyj-service/api/wf/i6000-api/selectInvolveDeviceInfo",
         "getSignDataUrl":"http://121.37.185.248:8910/sg/signData",
-        "queryInterval":"10s",
-        "allOrgIds":[""]
+        "queryInterval":"10h",
+        "allOrgIds":[""],
+        "beginDateDiff":-3,
+        "newWorkTicketStatusLabel":"工作票许可",
+        "updateWorkTicketStatusValue":"变更与延期"
     }
 }

@@ -41,7 +41,7 @@ func main() {
 		CRVClient:crvClinet,
 		I6000Conf:&conf.I6000Conf,
 	}
-	//i6000Client.Test()
+	i6000Client.Test()
 	i6000Client.Init()
 	i6000Controller:=&i6000.I6000Controller{
 		I6000Client:i6000Client,

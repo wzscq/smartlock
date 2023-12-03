@@ -88,7 +88,7 @@ func main() {
 	mqttClient.Init()
 	slController.Bind(router)
 	
-	go lockStatusMonitor.StartMonitor()
+	//go lockStatusMonitor.StartMonitor()
 	lockController.Init()
 
 	//i6000

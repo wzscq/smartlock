@@ -36,6 +36,9 @@ type I6000Conf struct {
 	GetSignDataUrl string `json:"getSignDataUrl"`
 	AllOrgIds []string `json:"allOrgIds"`
 	QueryInterval string `json:"queryInterval"`
+	BeginDateDiff int `json:"beginDateDiff"`
+	NewWorkTicketStatusLabel string `json:"newWorkTicketStatusLabel"`
+	UpdateWorkTicketStatusValue string `json:"updateWorkTicketStatusValue"`
 }
 
 type lockMonitorConf struct {

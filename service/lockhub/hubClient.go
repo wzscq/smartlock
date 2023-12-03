@@ -228,7 +228,7 @@ func (hc *HubClient)SendReceive(){
 			hc.Disconnect()
 			continue
 		}
-		time.Sleep(5*time.Second)
+		time.Sleep(2*time.Second)
 	}
 }
 

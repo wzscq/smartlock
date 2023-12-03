@@ -136,8 +136,8 @@ func (lsm *LockStatusMonitor)SendUpdateItemToMqtt(monitorItem lockStatus){
 		log.Println("SendUpdateItemToMqtt error:",err)
 		return
 	}
-  	// Convert bytes to string.
-  	jsonStr := string(bytes)
+  // Convert bytes to string.
+  jsonStr := string(bytes)
 	lsm.MQTTClient.Publish(lsm.MQTTClient.SendTopic,jsonStr)
 }
 
