@@ -29,20 +29,12 @@ type crvConf struct {
 	Token string `json:"token"`
 }
 
-type I6000Conf struct {
-	FindWorkTicket string `json:"findWorkTicket"`
-	SelectInvolveSystemInfo string `json:"selectInvolveSystemInfo"`
-	SelectInvolveDeviceInfo string `json:"selectInvolveDeviceInfo"`
-	GetSignDataUrl string `json:"getSignDataUrl"`
-	AllOrgIds []string `json:"allOrgIds"`
-	QueryInterval string `json:"queryInterval"`
-}
-
 type lockMonitorConf struct {
 	HubPort string `json:"hubPort"`
 	Interval string `json:"interval"`
 	BatchInterval string `json:"batchInterval"`
 	Timeout string `json:"timeout"`
+	Active bool `json:"active"`
 }
 
 type Config struct {
@@ -50,7 +42,6 @@ type Config struct {
 	MQTT mqttConf `json:"mqtt"`
 	CRV crvConf `json:"crv"`
 	Monitor lockMonitorConf `json:"lockMonitor"`
-	I6000Conf I6000Conf `json:"i6000"`
 }
 
 var gConfig Config

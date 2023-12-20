@@ -17,7 +17,7 @@ docker save -o smartlock.tar wangzhsh/smartlock:0.1.0
 docker load -i smartlock.tar
 
 #run smartlock in docker
-docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smartlock/conf wangzhsh/smartlock:0.1.0
+docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smartlock/conf wangzhsh/smartlock:0.1.1
 
 2023-02-19
 1、补充了三个关联表：
@@ -111,3 +111,7 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
     修改接口程序配置文件，增加了2个配置项，用于过滤有效的工单
 2、需改sl_application配置，增加申请状态和对应的视图
     {"value":"4","label":"工单变更"}
+
+2023-12-20 新客户版本
+1、创建smartlockv3应用，并需改对用配置
+2、后台服务中增加配置参数控制定时读取状态逻辑是否启动

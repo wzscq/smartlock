@@ -9,7 +9,6 @@ import (
 	"smartlockservice/lock"
 	"smartlockservice/lockservice"
 	"smartlockservice/lockhub"
-	//"smartlockservice/i6000"
 	"log"
 	"os"
 )
@@ -89,20 +88,9 @@ func main() {
 	slController.Bind(router)
 	
 	//go lockStatusMonitor.StartMonitor()
-	lockController.Init()
-
-	//i6000
-	/*singData:=i6000.GetSingData(conf.I6000Conf.GetSignDataUrl)
-	log.Println("singData:",singData)
-	i6000Client:=&i6000.I6000Client{
-		CRVClient:crvClinet,
-		I6000Conf:&conf.I6000Conf,
+	if conf.Monitor.Active == true {
+		lockController.Init()
 	}
-	i6000Client.Init()
-	i6000Controller:=&i6000.I6000Controller{
-		I6000Client:i6000Client,
-	}
-	i6000Controller.Bind(router)*/
 
 	router.Run(conf.Service.Port) // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }

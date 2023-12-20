@@ -21,14 +21,7 @@
         "hubPort":"18100",
         "interval":"500ms",
         "batchInterval":"10s",
-        "timeout":"500ms"
-    },
-    "i6000":{
-        "findWorkTicket":"http://21.11.7.20/i6000-dyjtwoticket-service/i6000-api/findWorkTicket",
-        "selectInvolveSystemInfo":"http://21.11.7.20/i6000-dyj-service/api/wf/i6000-api/selectInvolveSystemInfo",
-        "selectInvolveDeviceInfo":"http://21.11.7.20/i6000-dyj-service/api/wf/i6000-api/selectInvolveDeviceInfo",
-        "getSignDataUrl":"http://121.37.185.248:8910/sg/signData",
-        "queryInterval":"10s",
-        "allOrgIds":[""]
+        "timeout":"500ms",
+        "active":false
     }
 }
