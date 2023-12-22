@@ -53,10 +53,10 @@ func (mqc *MQTTClient) connectHandler(client mqtt.Client){
 	log.Println("MQTTClient connectHandler connect status: ",client.IsConnected())
 	if client.IsConnected() {
 		log.Println("MQTTClient Subscribe SendTopic: ",mqc.SendTopic)
-		mqc.Client.Subscribe(mqc.SendTopic,0,mqc.onResponse)
+		client.Subscribe(mqc.SendTopic,0,mqc.onResponse)
 		
 		log.Println("MQTTClient Subscribe KeyControlAcceptTopic: ",mqc.KeyControlAcceptTopic)
-		mqc.Client.Subscribe(mqc.KeyControlAcceptTopic,0,mqc.onKeyControlResponse)
+		client.Subscribe(mqc.KeyControlAcceptTopic,0,mqc.onKeyControlResponse)
 	}
 }
 
