@@ -51,6 +51,13 @@ func (mqc *MQTTClient) getClient()(mqtt.Client){
 
 func (mqc *MQTTClient) connectHandler(client mqtt.Client){
 	log.Println("MQTTClient connectHandler connect status: ",client.IsConnected())
+	if client.IsConnected() {
+		log.Println("MQTTClient Subscribe SendTopic: ",mqc.SendTopic)
+		mqc.Client.Subscribe(mqc.SendTopic,0,mqc.onResponse)
+		
+		log.Println("MQTTClient Subscribe KeyControlAcceptTopic: ",mqc.KeyControlAcceptTopic)
+		mqc.Client.Subscribe(mqc.KeyControlAcceptTopic,0,mqc.onKeyControlResponse)
+	}
 }
 
 func (mqc *MQTTClient) connectLostHandler(client mqtt.Client, err error){
@@ -91,6 +98,4 @@ func (mqc *MQTTClient)Publish(topic,content string)(int){
 
 func (mqc *MQTTClient) Init(){
 	mqc.Client=mqc.getClient()
-	mqc.Client.Subscribe(mqc.SendTopic,0,mqc.onResponse)
-	mqc.Client.Subscribe(mqc.KeyControlAcceptTopic,0,mqc.onKeyControlResponse)
 }
