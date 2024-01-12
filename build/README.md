@@ -115,3 +115,15 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 2023-12-20 新客户版本
 1、创建smartlockv3应用，并需改对用配置
 2、后台服务中增加配置参数控制定时读取状态逻辑是否启动
+
+2024-01-09 v3
+1、回复人员信息表
+    a、人员表增加角色字段
+    alter table sl_person
+    add column role_type varchar(2) NULL;
+    b、修改模型配置 sl_person
+2、授权申请页面不需要审批流程
+    a、修改模型配置 sl_application
+3、仪表盘筛选条件中区域字段去掉默认值
+    a、修改仪表盘配置 dashboard.json
+    b、修改report前端页面代码
