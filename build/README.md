@@ -117,7 +117,7 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 2、后台服务中增加配置参数控制定时读取状态逻辑是否启动
 
 2024-01-09 v3
-1、回复人员信息表
+1、人员信息表
     a、人员表增加角色字段
     alter table sl_person
     add column role_type varchar(2) NULL;
@@ -127,3 +127,12 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 3、仪表盘筛选条件中区域字段去掉默认值
     a、修改仪表盘配置 dashboard.json
     b、修改report前端页面代码
+
+2024-01-16
+1、operator去掉删除功能，去掉申请页面的状态字段
+    修改模型配置 sl_application
+2、钥匙授权记录详情报错
+    修改模型配置 sl_key_authorization
+3、admin任何时候都可以查看编辑删除，其他角色在发起后都只能查看【禁止删除修改】；
+   a、修改模型配置 sl_application
+   b、修改后台逻辑 补充修改申请记录状态的逻辑

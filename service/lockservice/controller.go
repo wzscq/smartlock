@@ -172,7 +172,7 @@ func (controller *SmartLockController)writekey(c *gin.Context){
 		c.IndentedJSON(http.StatusOK, rsp)
 		return
 	}
-	
+
 	rsp:=common.CreateResponse(nil,nil)
 	c.IndentedJSON(http.StatusOK, rsp)
 	log.Println("SmartLockController end writekey")

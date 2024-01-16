@@ -211,6 +211,18 @@ func (lockOperator *LockOperator)WriteKey(keyControllerID,appID,token string)(in
 		return commonErr
 	}
 
+	//更新申请状态
+	list,ok:=req.Result["list"].([]interface{})
+	if ok && len(list)>0 {
+		row,ok:=list[0].(map[string]interface{})
+		if ok {
+			version,ok:=row["version"]
+			if ok {
+				lockOperator.UpdateAppStatus(appID,token,version)
+			}
+		}
+	}
+
 	return common.ResultSuccess
 }
 
@@ -255,4 +267,22 @@ func (lockOperator *LockOperator)SyncLockList(token string)(int){
 	}
 
 	return lockOperator.MQTTClient.Publish(lockOperator.AcceptTopic,paramStr)
+}
+
+func (lockOperator *LockOperator)UpdateAppStatus(applicationID,token string,version interface{})(int){
+	recList:=[]map[string]interface{}{
+		map[string]interface{}{
+			"id":applicationID,
+			"status":"2",
+			"_save_type":"update",
+			"version":version,
+		},
+	}
+	
+	saveReq:=&crv.CommonReq{
+		ModelID:"sl_application",
+		List:&recList,
+	}
+	_,errorCode:=lockOperator.CRVClient.Save(saveReq,token)
+	return errorCode
 }
