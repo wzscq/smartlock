@@ -23,5 +23,8 @@
         "batchInterval":"10s",
         "timeout":"500ms",
         "active":false
+    },
+    "lockOper":{
+        "UpdateAppStatus":true
     }
 }

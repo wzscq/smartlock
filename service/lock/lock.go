@@ -45,6 +45,7 @@ type LockOperator struct {
 	MQTTClient *mqtt.MQTTClient
 	AcceptTopic string
 	KeyControlSendTopic string
+	LockConf *common.LockConf
 }
 
 var applicatonFields=[]map[string]interface{}{
@@ -212,13 +213,15 @@ func (lockOperator *LockOperator)WriteKey(keyControllerID,appID,token string)(in
 	}
 
 	//更新申请状态
-	list,ok:=req.Result["list"].([]interface{})
-	if ok && len(list)>0 {
-		row,ok:=list[0].(map[string]interface{})
-		if ok {
-			version,ok:=row["version"]
+	if lockOperator.LockConf.UpdateAppStatus==true {
+		list,ok:=req.Result["list"].([]interface{})
+		if ok && len(list)>0 {
+			row,ok:=list[0].(map[string]interface{})
 			if ok {
-				lockOperator.UpdateAppStatus(appID,token,version)
+				version,ok:=row["version"]
+				if ok {
+					lockOperator.UpdateAppStatus(appID,token,version)
+				}
 			}
 		}
 	}
