@@ -50,7 +50,7 @@ type LockOperator struct {
 
 var appAuhorRecFields=[]map[string]interface{}{
 	{"field": "id"},
-	{"field": "update_user"},
+	{"field": "approver"},
 }
 
 var applicatonFields=[]map[string]interface{}{
@@ -171,7 +171,7 @@ func (lockOperator *LockOperator)getAppAuthor(appID string)(string){
 	if len(resLst)>0 {
 		row,ok:=resLst[0].(map[string]interface{})
 		if ok {
-			author,ok:=row["update_user"]
+			author,ok:=row["approver"]
 			if ok {
 				return author.(string)
 			}

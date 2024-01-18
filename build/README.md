@@ -152,3 +152,8 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 
 3、智能钥匙授权按钮限制去除；
     a、修改模型配置 sl_application
+
+2024-01-18
+1、钥匙下发记录中的授权人应该是申请中的审批人
+    a、修改后台服务逻辑
+    b、修改模型配置 sl_key_authorization
