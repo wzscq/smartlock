@@ -136,3 +136,19 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 3、admin任何时候都可以查看编辑删除，其他角色在发起后都只能查看【禁止删除修改】；
    a、修改模型配置 sl_application
    b、修改后台逻辑 补充修改申请记录状态的逻辑
+
+2024-01-18
+1、增加钥匙归还功能，钥匙授权记录补充授权人、钥匙归还时间、归还状态字段
+    a、修改数据库表增加相应字段
+    alter table sl_key_authorization
+    add column key_status varchar(2) NOT NULL DEFAULT 0,
+    add column author varchar(25) NOT NULL ,
+    add column key_return_time datetime(0) NULL ;
+    b、修改模型配置 sl_key_authorization
+    c、修改后台逻辑补充授权人信息
+
+2、新增页面默认起止日期时间为今天00:00:00到23:59:59；
+    a、修改模型配置 sl_application
+
+3、智能钥匙授权按钮限制去除；
+    a、修改模型配置 sl_application

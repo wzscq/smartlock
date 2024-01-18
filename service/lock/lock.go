@@ -48,6 +48,11 @@ type LockOperator struct {
 	LockConf *common.LockConf
 }
 
+var appAuhorRecFields=[]map[string]interface{}{
+	{"field": "id"},
+	{"field": "update_user"},
+}
+
 var applicatonFields=[]map[string]interface{}{
 	{"field": "id"},
 	{
@@ -144,7 +149,41 @@ func (lockOperator *LockOperator)DealKeyControllerOperation(opMsg []byte){
 	}
 }
 
+func (lockOperator *LockOperator)getAppAuthor(appID string)(string){
+	commonRep:=crv.CommonReq{
+		ModelID:"sl_application",
+		Filter:&map[string]interface{}{
+			"id":appID,
+		},
+		Fields:&appAuhorRecFields,
+	}
+
+	req,_:=lockOperator.CRVClient.Query(&commonRep,"")
+	if req.Error == true {
+		return ""
+	}
+
+	resLst,ok:=req.Result["list"].([]interface{})
+	if !ok {
+		return ""
+	}
+
+	if len(resLst)>0 {
+		row,ok:=resLst[0].(map[string]interface{})
+		if ok {
+			author,ok:=row["update_user"]
+			if ok {
+				return author.(string)
+			}
+		}
+	}
+
+	return ""
+}
+
 func (lockOperator *LockOperator)DealAuthRec(op *KCOperParm){
+	author:=lockOperator.getAppAuthor(op.ApplicationID)
+
 	recList:=[]map[string]interface{}{
 		map[string]interface{}{
 			"key_controller_id":op.KeyControllerID,
@@ -152,6 +191,7 @@ func (lockOperator *LockOperator)DealAuthRec(op *KCOperParm){
 			"application_id":op.ApplicationID,
 			"status":op.Status,
 			"message":op.Message,
+			"author":author,
 			"_save_type":"create",
 		},
 	}
