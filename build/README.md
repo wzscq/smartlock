@@ -157,3 +157,7 @@ docker run -d --name smartlock -p8301:80 -v /root/smartlock/conf:/services/smart
 1、钥匙下发记录中的授权人应该是申请中的审批人
     a、修改后台服务逻辑
     b、修改模型配置 sl_key_authorization
+
+2024-01-19
+1、钥匙下发记录详情中补充申请事由
+    a、修改模型配置 sl_key_authorization

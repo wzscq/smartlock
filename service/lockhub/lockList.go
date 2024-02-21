@@ -5,6 +5,7 @@ import (
 	"smartlockservice/common"
 	"log"
 	"sync"
+	"strconv"
 )
 
 var	queryLockFields=[]map[string]interface{}{
@@ -108,8 +109,10 @@ func (ll *LockList)UpdateLockStatus(result *CommandResult){
 }
 
 func (ll *LockList)FindLock(lockNo string) *LockItem {
+	lockNoDec, _ := strconv.ParseInt(lockNo, 10, 64)
 	for index,lockItem:=range ll.Locks {
-		if lockItem.ID == lockNo {
+		lockIDDec,_:= strconv.ParseInt(lockItem.ID, 10, 64)
+		if lockIDDec == lockNoDec {
 			return &ll.Locks[index]
 		}
 	}
